@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+   <head>
+   	  <meta charset="UTF-8" >
+      <title>立即报修</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- 引入 Bootstrap -->
+      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+      <script src="js/jquery-3.1.1.js"></script>
+      <style>
+      	.select{
+      		width:50%;
+      	}      
+      </style>
+   </head>
+   <body>
+		<div class="alert alert-danger alert-dismissible" hidden role="alert"  id="warnning">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true" id="close">&times;</span></button>
+		  <span id="tips" ></span>不能为空!
+		</div>	  
+	  <div style="padding: 10px ;">
+			<h1 class="text-center">报修信息</h1>
+	  </div>
+		<form class="form-horizontal" role="form" action="repair.action" method="post" onsubmit="return CheckForm();" onsubmit="CheckForm()">
+        <div class="input-group">
+            <label class="input-group-addon input-lg" >姓名：</label>
+            <input type="text" id="name" name="name" class="form-control input-lg" placeholder="请输入你的姓名">
+        </div>
+        <br>
+        <div class="input-group">
+            <label class="input-group-addon input-lg" >电话：</label>
+            <input type="text" id="phone" name="phone" class="form-control input-lg" placeholder="请输入的你的联系方式">
+        </div>
+        <br>
+       	<div class="input-group">
+            <label class="input-group-addon input-lg" >地址：</label>
+            <select class="form-control input-lg select" id="address1" name="address1">
+				<option value="0">请选择区域</option>
+			</select>
+			<select class="form-control input-lg select" id="address2" name="address2">
+					<option value="0">请选择泵房</option>
+			</select>
+		</div>
+        <br>
+		<div class="input-group">		
+			<label class="input-group-addon input-lg" >报修内容：</label>
+			<select class="form-control input-lg select" id="content" name="content">
+					<option value="0">请选择故障信息</option>
+					<option value="停电">停电</option>
+					<option value="漏水">漏水</option>
+					<option value="网络不通">网络不通</option>
+					<option value="供压不稳">供压不稳</option>
+					<option value="其他">其他</option>
+			</select>
+			<textarea class="form-control" rows="3" id="content2" name="content2" disabled placeholder="其他故障信息"></textarea>
+        </div>
+		<br>
+		<div class="input-group">
+			<label>报修照片（选填）</label>
+			<p class="help-block">仅限故障部位照片</p>
+			<input accept="image/*" type="file" id="img">		
+  </div>		
+		<button type="submit" value="sub" class="btn btn-primary btn-lg btn-block" style="bottom:0;position:fixed;">提交</button>		
+    </form>
+    
+    
+		<script>
+		
+			$(document).ready(function(){
+				$.post("getAddress.action",null,function(data){
+					for(var i =0;i<data.length;i++){
+						$("#address1").append('<option value='+data[i].pumproomregionid+'>'+data[i].regionname+'</option>');
+					}
+				});	
+			});
+ 			$("#address1").change(function(){
+ 				var id = $("#address1").val();
+ 				$.post("getPumpRoom.action",{'id':id},function(data){
+					for(var i =0;i<data.length;i++){
+						$("#address2").append('<option value='+data[i].PUMPROOM_ID+'>'+data[i].PUMPROOM_NAME+'</option>');
+					}
+				});
+ 			});
+ 			$("#content").change(function(){
+ 				if($("#content").val()=='其他'){
+ 					$("#content2").removeAttr('disabled');
+ 				}
+ 			});
+			function CheckForm(){
+				var flag = false;
+				var tip1="",tip2="",tip3="";
+				if($("#name").val() == null || $("#name").val() == ''){
+					flag = true;
+					tip1="姓名 ";
+				}
+				if($("#phone").val() == null || $("#phone").val() == ''){
+					flag = true;
+					tip2="电话 ";
+				}
+				if($("#address2").val()==0){
+					tip3="地址";
+					flag = true;
+				}
+				if(flag){
+					$("#warnning").removeAttr("hidden");
+					$("#tips").text(tip1+tip2+tip3);
+					return false;
+				}
+			}
+			$("#close").click(function(){
+				$("#warnning").attr("hidden","false");
+			});
+		</script>
+		
+	  
+   </body>
+</html>
